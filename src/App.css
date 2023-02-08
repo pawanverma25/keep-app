@@ -11,3 +11,20 @@ body {
 body::-webkit-scrollbar, .NoteDiv::-webkit-scrollbar {
   display: none;
 }
+
+.toggle-checkbox:checked {
+  @apply: right-0 border-green-400;
+  right: 0;
+}
+
+.toggle-checkbox {
+  border-color: #b4bfcc;
+}
+
+.toggle-label {
+  background-color: #b4bfcc;
+}
+
+.toggle-checkbox:checked + .toggle-label {
+  @apply: bg-green-400;
+}

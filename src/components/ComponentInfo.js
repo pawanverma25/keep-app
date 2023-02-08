@@ -67,7 +67,7 @@ const ComponentInfo = ({
 	return (
 		<div className="flex flex-col mx-auto">
 			<div className="flex min-h-10 lg:w-[700px] md:w-[600px] sm:w-[500px] mx-5 mt-2 px-4 py-2 bg-[#76abe8] rounded-t-md shadow-lg justify-between">
-				<h1 className="flex-[2_0_0%] text-xl font-semibold text-white my-auto">
+				<h1 className="flex-[2_0_0%] text-xl font-semibold text-white my-auto text-ellipsis overflow-hidden">
 					{component.title}
 				</h1>
 				<button
@@ -98,7 +98,9 @@ const ComponentInfo = ({
 			</div>
 			<div className="NoteDiv flex flex-col min-h-[4rem] lg:w-[700px] md:w-[600px] sm:w-[500px] mx-5 mb-5 overflow-y-scroll px-3 py-1 rounded-b-md shadow-xl bg-[#ccd4de]">
 				{component.type === "note" ? (
-					<p className="float-none">{component.text}</p>
+					component.text
+						.split("\n")
+						.map((text) => <p className="float-none">{text}</p>)
 				) : (
 					<TodoListComponent
 						component={component}
