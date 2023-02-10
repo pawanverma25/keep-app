@@ -1,24 +1,28 @@
 import { useState } from "react";
 import { MdPlaylistAdd } from "react-icons/md";
+import { RiDeleteBin2Fill, RiSave2Fill } from "react-icons/ri";
 import "../App.css";
 
-const FormNote = ({ note, setNote }) => {
+export const FormNote = ({ note, setNote }) => {
 	return (
 		<div className="p-1 flex flex-col h-fit">
-			<input
+			<textarea
 				name="title"
-				className="rounded-md mt-3 px-2 text-xl font-semibold bg-inherit focus:outline-none"
+				className="resize-none overflow-hidden whitespace-pre-wrap mt-3 px-2 text-xl font-semibold bg-inherit focus:outline-none border-b-2 border-[#76abe8] h-[1.76rem]"
 				placeholder="Title"
 				value={note.title}
+				onClick={(e) => (e.target.style.height = `${e.target.scrollHeight}px`)}
 				onChange={(e) => {
+					e.target.style.height = `${e.target.scrollHeight}px`;
 					setNote({ ...note, title: e.target.value });
-				}}></input>
+				}}></textarea>
 			<textarea
 				name="note"
 				type="text"
-				placeholder="Your Note.."
-				className="rounded-md mt-2 bg-inherit p-2 font-medium min-h-fit focus:outline-none resize-none overflow-hidden whitespace-pre-wrap"
+				placeholder="Your Note..."
+				className="mt-2 bg-inherit p-2 min-h-fit focus:outline-none resize-none overflow-hidden whitespace-pre-wrap"
 				value={note.text}
+				onClick={(e) => (e.target.style.height = `${e.target.scrollHeight}px`)}
 				onChange={(e) => {
 					e.target.style.height = `${e.target.scrollHeight}px`;
 					setNote({ ...note, text: e.target.value });
@@ -27,29 +31,72 @@ const FormNote = ({ note, setNote }) => {
 	);
 };
 
-const FormTodo = ({ todo, setTodo }) => {
+export const FormTodo = ({ todo, setTodo }) => {
+	let [listItemText, setListItemText] = useState("");
+
 	return (
 		<div className="p-1 flex flex-col h-fit">
-			<input
+			<textarea
 				name="title"
-				className="rounded-md mt-3 px-2 text-xl font-semibold bg-inherit focus:outline-none"
+				className="mt-3 px-2 text-xl font-semibold bg-inherit focus:outline-none border-b-2 border-[#76abe8] resize-none overflow-hidden whitespace-pre-wrap h-[1.76rem]"
 				placeholder="Title"
 				value={todo.title}
+				onClick={(e) => (e.target.style.height = `${e.target.scrollHeight}px`)}
 				onChange={(e) => {
+					e.target.style.height = `${e.target.scrollHeight}px`;
 					setTodo({ ...todo, title: e.target.value });
-				}}></input>
+				}}></textarea>
+			<ul className="flex flex-col my-4 mx-auto marker:text-gray-400 marker:text-2xl list-disc">
+				{todo.list.map((item, index) => (
+					<li className="bg-transparent border-b-2 border-[#76abe8] my-2">
+						<button
+							type="button"
+							className="m-1 p-1 rounded-lg hover:bg-[#fba0a0] bg-[#c2ddfc] hover:scale-150 hover:shadow-md h-min mr-2"
+							onClick={() => {
+								const newTodoList = [...todo.list];
+								newTodoList.splice(index, 1);
+								setTodo({ ...todo, list: newTodoList });
+							}}>
+							<RiDeleteBin2Fill
+								size={12}
+								className=" text-[#408de6] hover:text-[#ff0000]"
+							/>
+						</button>
+						<p className="font-semibold inline">{item.text}</p>
+					</li>
+				))}
+				<li className="bg-transparent border-b-2 border-[#76abe8] my-2">
+					<input
+						className="font-semibold lg:w-[400px] md:w-[300px] sm:w-[200px] bg-inherit focus:outline-none mr-2"
+						placeholder="list item..."
+						value={listItemText}
+						onChange={(e) => {
+							setListItemText(e.target.value);
+						}}></input>
+					<button
+						type="button"
+						className="bg-[#76abe8] rounded-md py-1 px-2 mr-1 ml-auto select-none focus:outline-none"
+						onClick={(e) => {
+							if (listItemText === "") return;
+							setTodo({
+								...todo,
+								list: todo.list.concat([{ text: listItemText, done: false }]),
+							});
+							setListItemText("");
+						}}>
+						<RiSave2Fill color="white" />
+					</button>
+				</li>
+			</ul>
 		</div>
 	);
 };
 
-const AddComponent = ({ lastId, onAddComponent }) => {
+export const AddComponent = ({ lastId, onAddComponent }) => {
 	const clearComponent = {
-		id: -1,
 		type: "note",
 		title: "",
 		pinned: false,
-		date: "",
-		time: "",
 		text: "",
 		list: [],
 	};
@@ -81,14 +128,15 @@ const AddComponent = ({ lastId, onAddComponent }) => {
 		else newComponent = { ...newComponent, list: component.list };
 		onAddComponent(newComponent);
 		setComponent(clearComponent);
+		setFormType("note");
 		setToggleForm(!toggleForm);
 	};
 
 	return (
-		<div className="flex flex-col lg:w-[700px] lg:p-0 md:w-[600px] md:p-0 sm:w-[500px] sm:p-0 w-[100%] px-4 hover:scale-105 mb-2 justify-center mx-auto">
+		<div className="flex flex-col lg:w-[700px] lg:p-0 md:w-[600px] md:p-0 sm:w-[500px] sm:p-0 w-[100%] px-4 mb-2 justify-center mx-auto">
 			<button
 				type="button"
-				className={`Note-Width flex w-[100%] h-10 bg-[#76abe8] mx-auto justify-center select-none focus:outline-none ${
+				className={`Note-Width flex w-[100%] h-10 bg-[#76abe8] mx-auto justify-center select-none focus:outline-none hover:scale-105 ${
 					toggleForm ? "rounded-t-lg" : "rounded-lg"
 				} shadow-xl`}
 				onClick={() => setToggleForm(!toggleForm)}>
@@ -106,7 +154,7 @@ const AddComponent = ({ lastId, onAddComponent }) => {
 								type="checkbox"
 								name="toggle"
 								id="toggle"
-								className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-[#76abe8] border-4 appearance-none cursor-pointer"
+								className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-[#76abe8] border-4 appearance-none cursor-pointer focus:outline-none"
 								onClick={() => {
 									if (formType === "note") setFormType("todo");
 									else setFormType("note");
@@ -143,5 +191,3 @@ const AddComponent = ({ lastId, onAddComponent }) => {
 		</div>
 	);
 };
-
-export default AddComponent;

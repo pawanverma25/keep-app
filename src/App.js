@@ -1,20 +1,29 @@
 import { useState } from "react";
 import "./App.css";
-import AddComponent from "./components/AddComponent";
+import { AddComponent } from "./components/AddComponent";
 import Navbar from "./components/Navbar";
 import ComponentInfo from "./components/ComponentInfo";
 
 function App() {
-	const onComponentPin = (noteId) => {
+	const onComponentPin = (componentId) => {
 		const newComponentList = componentList
 			.map((note) =>
-				note.id === noteId ? { ...note, pinned: !note.pinned } : { ...note }
+				note.id === componentId
+					? { ...note, pinned: !note.pinned }
+					: { ...note }
 			)
 			.sort((a, b) => b.pinned - a.pinned);
 		setComponentList(newComponentList);
 	};
-	const onDeleteComponent = (noteId) => {
-		setComponentList(componentList.filter((curNote) => curNote.id !== noteId));
+	const onComponentChange = (index, newComponent) => {
+		const newComponentList = [...componentList];
+		newComponentList.splice(index, 1);
+		setComponentList([newComponent, ...newComponentList]);
+	};
+	const onDeleteComponent = (componentId) => {
+		setComponentList(
+			componentList.filter((curNote) => curNote.id !== componentId)
+		);
 	};
 	let components = [
 		{
@@ -99,20 +108,24 @@ function App() {
 						);
 					}}
 				/>
-				{componentList.map((component) => (
-					<ComponentInfo
-						key={component.id}
-						component={component}
-						onDeleteComponent={onDeleteComponent}
-						onComponentPin={onComponentPin}
-						onListChange={(todoId, todoList) => {
-							const newComponentList = componentList.map((el) =>
-								el.id === todoId ? { ...el, list: todoList } : el
-							);
-							setComponentList(newComponentList);
-						}}
-					/>
-				))}
+				{componentList
+					.sort((a, b) => b.pinned - a.pinned)
+					.map((component, index) => (
+						<ComponentInfo
+							key={component.id}
+							index={index}
+							component={component}
+							onComponentChange={onComponentChange}
+							onDeleteComponent={onDeleteComponent}
+							onComponentPin={onComponentPin}
+							onListChange={(todoId, todoList) => {
+								const newComponentList = componentList.map((el) =>
+									el.id === todoId ? { ...el, list: todoList } : el
+								);
+								setComponentList(newComponentList);
+							}}
+						/>
+					))}
 			</div>
 		</>
 	);
