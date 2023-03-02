@@ -6,30 +6,37 @@ import ComponentInfo from "./components/ComponentInfo";
 
 const App = () => {
 	const onComponentPin = (componentId) => {
-		const newComponentList = componentList
-			.map((note) =>
-				note.id === componentId
-					? { ...note, pinned: !note.pinned }
-					: { ...note }
-			)
-			.sort((a, b) => b.pinned - a.pinned);
-		setComponentList(newComponentList);
+		const onComponentPinAsync = async () => {
+			const response = await axios.put("/api/pin/", {
+				_id: componentId,
+			});
+			setComponentList(response.data);
+		};
+		onComponentPinAsync();
 	};
-	const onComponentChange = (index, newComponent) => {
-		const newComponentList = [...componentList];
-		newComponentList.splice(index, 1);
-		setComponentList([newComponent, ...newComponentList]);
+	const onComponentChange = (newComponent) => {
+		const onComponentChangeAsync = async (newComponent) => {
+			const response = await axios.put(`/api/edit/`, newComponent);
+			setComponentList(response.data);
+		};
+		onComponentChangeAsync(newComponent);
 	};
 	const onDeleteComponent = (componentId) => {
-		setComponentList(
-			componentList.filter((curNote) => curNote.id !== componentId)
-		);
+		const onDeleteComponentAsync = async (componentId) => {
+			const response = await axios.put(`/api/del/`, { _id: componentId });
+			setComponentList(response.data);
+		};
+		onDeleteComponentAsync(componentId);
 	};
 	const onListChange = (todoId, todoList) => {
-		const newComponentList = componentList.map((el) =>
-			el.id === todoId ? { ...el, list: todoList } : el
-		);
-		setComponentList(newComponentList);
+		const onListChangeAsync = async (todoId, todoList) => {
+			const response = await axios.put(`/api/list/`, {
+				_id: todoId,
+				todoList: todoList,
+			});
+			setComponentList(response.data);
+		};
+		onListChangeAsync(todoId, todoList);
 	};
 
 	let [componentList, setComponentList] = useState([]);
@@ -42,39 +49,31 @@ const App = () => {
 		fetchComponentList();
 	}, []);
 
-	useEffect(() => {
-		const postComponentList = async () => {
-			await axios.post("http://localhost:8000/", componentList);
-		};
-		postComponentList();
-	}, [componentList]);
-
 	return (
 		<div className="container flex flex-wrap flex-col mx-auto px-5 mt-12">
 			<AddComponent
 				lastId={componentList.reduce(
-					(max, item) => (Number(item.id) > max ? Number(item.id) : max),
+					(max, item) => (Number(item._id) > max ? Number(item.id) : max),
 					0
 				)}
-				onAddComponent={(newNote) => {
-					setComponentList(
-						[newNote, ...componentList].sort((a, b) => b.pinned - a.pinned)
-					);
+				onAddComponent={(newComponent) => {
+					const onAddComponentAsync = async (newComponent) => {
+						const response = await axios.put(`/api/add/`, newComponent);
+						setComponentList(response.data);
+					};
+					onAddComponentAsync(newComponent);
 				}}
 			/>
-			{componentList
-				.sort((a, b) => b.pinned - a.pinned)
-				.map((component, index) => (
-					<ComponentInfo
-						key={component.id}
-						index={index}
-						component={component}
-						onComponentChange={onComponentChange}
-						onDeleteComponent={onDeleteComponent}
-						onComponentPin={onComponentPin}
-						onListChange={onListChange}
-					/>
-				))}
+			{componentList.map((component, index) => (
+				<ComponentInfo
+					key={component._id}
+					component={component}
+					onComponentChange={onComponentChange}
+					onDeleteComponent={onDeleteComponent}
+					onComponentPin={onComponentPin}
+					onListChange={onListChange}
+				/>
+			))}
 		</div>
 	);
 };

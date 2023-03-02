@@ -92,7 +92,7 @@ export const FormTodo = ({ todo, setTodo }) => {
 	);
 };
 
-export const AddComponent = ({ lastId, onAddComponent }) => {
+export const AddComponent = ({ onAddComponent }) => {
 	const clearComponent = {
 		type: "note",
 		title: "",
@@ -112,7 +112,6 @@ export const AddComponent = ({ lastId, onAddComponent }) => {
 		)
 			return;
 		let newComponent = {
-			id: lastId + 1,
 			type: formType,
 			title: component.title,
 			pinned: false,

@@ -15,12 +15,10 @@ const TodoListComponent = ({ component, onListChange }) => {
 
 	const onDragEnd = (result) => {
 		if (!result.destination) return;
-		const newComponentList = [...todoList];
-		const dragItemContent = newComponentList[result.source.index];
-		newComponentList.splice(result.source.index, 1);
-		newComponentList.splice(result.destination.index, 0, dragItemContent);
-		setTodoList(newComponentList);
-		onListChange(component.id, newComponentList);
+		const [dragItemContent] = todoList.splice(result.source.index, 1);
+		todoList.splice(result.destination.index, 0, dragItemContent);
+		onListChange(component._id, [...todoList]);
+		setTodoList([...todoList]);
 	};
 
 	return (
@@ -34,8 +32,8 @@ const TodoListComponent = ({ component, onListChange }) => {
 						{todoList.map((todo, index) => {
 							return (
 								<Draggable
-									key={component.id + "-" + index}
-									draggableId={component.id + "-" + index}
+									key={component._id + "-" + index}
+									draggableId={component._id + "-" + index}
 									index={index}>
 									{(provided) => (
 										<li
@@ -50,7 +48,7 @@ const TodoListComponent = ({ component, onListChange }) => {
 											<input
 												className="form-check-input peer appearance-none h-4 w-4 border border-[#408de6] rounded-sm bg-[#c2ddfc] checked:bg-[#408de6] checked:bg- focus:outline-none checked:line-through transition duration-200 bg-no-repeat bg-center bg-contain mr-2 cursor-pointer"
 												type="checkbox"
-												id={"CheckBox" + component.id + "-" + index}
+												id={"CheckBox" + component._id + "-" + index}
 												defaultChecked={todo.done}
 												onClick={(e) => {
 													const newComponentList = [...component.list];
@@ -59,7 +57,7 @@ const TodoListComponent = ({ component, onListChange }) => {
 														done: e.target.checked,
 													};
 													setTodoList(newComponentList);
-													onListChange(component.id, newComponentList);
+													onListChange(component._id, newComponentList);
 												}}
 											/>
 											<label
@@ -69,13 +67,14 @@ const TodoListComponent = ({ component, onListChange }) => {
 											</label>
 											<button
 												type="button"
-												className="m-1 p-1 rounded-lg hover:bg-[#fba0a0] bg-[#c2ddfc] hover:scale-150 hover:shadow-md h-min ml-auto"
+												className="group m-1 p-1 rounded-lg hover:bg-[#fba0a0] bg-[#c2ddfc] hover:scale-150 hover:shadow-md h-min ml-auto"
 												onClick={() => {
-													onListChange(todo.id, todoList.splice(index, 1));
+													todoList.splice(index, 1);
+													onListChange(component._id, todoList);
 												}}>
 												<RiDeleteBin2Fill
 													size={12}
-													className=" text-[#408de6] hover:text-[#ff0000]"
+													className=" text-[#408de6] group-hover:text-[#ff0000]"
 												/>
 											</button>
 										</li>
@@ -92,7 +91,6 @@ const TodoListComponent = ({ component, onListChange }) => {
 };
 
 const ComponentInfo = ({
-	index,
 	component,
 	onComponentChange,
 	onDeleteComponent,
@@ -131,7 +129,7 @@ const ComponentInfo = ({
 									minute: "numeric",
 								}),
 							};
-							onComponentChange(index, newComponent);
+							onComponentChange(newComponent);
 							setBeingEdited(false);
 						}}>
 						Submit
@@ -151,7 +149,7 @@ const ComponentInfo = ({
 					className="m-1 p-1 rounded-lg bg-[#c2ddfc] hover:scale-150 hover:shadow-md h-min"
 					onClick={() => {
 						setPinned(!pinned);
-						onComponentPin(component.id);
+						onComponentPin(component._id);
 					}}>
 					{pinned ? (
 						<RiPushpinFill color="#408de6" />
@@ -169,9 +167,9 @@ const ComponentInfo = ({
 				</button>
 				<button
 					type="button"
-					onClick={() => onDeleteComponent(component.id)}
-					className="m-1 p-1 rounded-lg hover:bg-[#fba0a0] bg-[#c2ddfc] hover:scale-150 hover:shadow-md h-min">
-					<RiDeleteBin2Fill className=" text-[#408de6] hover:text-[#ff0000]" />
+					onClick={() => onDeleteComponent(component._id)}
+					className="m-1 p-1 rounded-lg hover:bg-[#fba0a0] bg-[#c2ddfc] hover:scale-150 hover:shadow-md h-min group">
+					<RiDeleteBin2Fill className=" text-[#408de6] group-hover:text-[#ff0000]" />
 				</button>
 			</div>
 			<div className="NoteDiv flex flex-col min-h-[4rem] lg:w-[700px] md:w-[600px] sm:w-[500px] mx-5 mb-5 overflow-y-scroll px-3 py-1 rounded-b-md shadow-xl bg-[#ccd4de]">
