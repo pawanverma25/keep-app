@@ -115,12 +115,7 @@ export const AddComponent = ({ onAddComponent }) => {
 			type: formType,
 			title: component.title,
 			pinned: false,
-			date: new Date().toLocaleDateString("en-IN"),
-			time: new Date().toLocaleTimeString("en-IN", {
-				hour12: false,
-				hour: "numeric",
-				minute: "numeric",
-			}),
+			date: new Date(new Date().getTime() + 330 * 60 * 1000),
 		};
 		if (formType === "note")
 			newComponent = { ...newComponent, text: component.text };

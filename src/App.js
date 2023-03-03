@@ -28,16 +28,6 @@ const App = () => {
 		};
 		onDeleteComponentAsync(componentId);
 	};
-	const onListChange = (todoId, todoList) => {
-		const onListChangeAsync = async (todoId, todoList) => {
-			const response = await axios.put(`/api/list/`, {
-				_id: todoId,
-				todoList: todoList,
-			});
-			setComponentList(response.data);
-		};
-		onListChangeAsync(todoId, todoList);
-	};
 
 	let [componentList, setComponentList] = useState([]);
 
@@ -71,7 +61,6 @@ const App = () => {
 					onComponentChange={onComponentChange}
 					onDeleteComponent={onDeleteComponent}
 					onComponentPin={onComponentPin}
-					onListChange={onListChange}
 				/>
 			))}
 		</div>

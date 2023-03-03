@@ -9,8 +9,8 @@ body {
 }
 
 ::selection {
-  color: #00000066;
-  background: #81abdc;
+  color: #ECF2FF;
+  background: #3E54AC;
 }
 
 body::-webkit-scrollbar, .NoteDiv::-webkit-scrollbar {

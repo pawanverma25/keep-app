@@ -10,15 +10,13 @@ import { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { FormNote, FormTodo } from "./AddComponent";
 
-const TodoListComponent = ({ component, onListChange }) => {
-	let [todoList, setTodoList] = useState(component.list);
-
+const TodoListComponent = ({ component, onComponentChange }) => {
+	let todoList = component.list;
 	const onDragEnd = (result) => {
 		if (!result.destination) return;
 		const [dragItemContent] = todoList.splice(result.source.index, 1);
 		todoList.splice(result.destination.index, 0, dragItemContent);
-		onListChange(component._id, [...todoList]);
-		setTodoList([...todoList]);
+		onComponentChange({ ...component, list: todoList });
 	};
 
 	return (
@@ -46,22 +44,24 @@ const TodoListComponent = ({ component, onListChange }) => {
 												className="text-gray-400"
 											/>
 											<input
-												className="form-check-input peer appearance-none h-4 w-4 border border-[#408de6] rounded-sm bg-[#c2ddfc] checked:bg-[#408de6] checked:bg- focus:outline-none checked:line-through transition duration-200 bg-no-repeat bg-center bg-contain mr-2 cursor-pointer"
+												className="form-check-input peer appearance-none h-4 w-4 border border-[#408de6] rounded-sm bg-[#c2ddfc] checked:bg-[#408de6] checked:bg- focus:outline-none bg-no-repeat bg-center bg-contain mr-2 cursor-pointer outline-none"
 												type="checkbox"
 												id={"CheckBox" + component._id + "-" + index}
-												defaultChecked={todo.done}
+												checked={todo.done}
 												onClick={(e) => {
 													const newComponentList = [...component.list];
 													newComponentList[index] = {
 														...todo,
-														done: e.target.checked,
+														done: !todo.done,
 													};
-													setTodoList(newComponentList);
-													onListChange(component._id, newComponentList);
+													onComponentChange({
+														...component,
+														list: newComponentList,
+													});
 												}}
 											/>
 											<label
-												className="form-check-label peer-checked:line-through text-lg mr-5"
+												className="form-check-label peer-checked:line-through transition duration-1000 text-lg mr-5"
 												htmlFor="CheckBox">
 												{todo.text}
 											</label>
@@ -70,7 +70,10 @@ const TodoListComponent = ({ component, onListChange }) => {
 												className="group m-1 p-1 rounded-lg hover:bg-[#fba0a0] bg-[#c2ddfc] hover:scale-150 hover:shadow-md h-min ml-auto"
 												onClick={() => {
 													todoList.splice(index, 1);
-													onListChange(component._id, todoList);
+													onComponentChange({
+														...component,
+														list: [...todoList],
+													});
 												}}>
 												<RiDeleteBin2Fill
 													size={12}
@@ -95,25 +98,23 @@ const ComponentInfo = ({
 	onComponentChange,
 	onDeleteComponent,
 	onComponentPin,
-	onListChange,
 }) => {
 	let [pinned, setPinned] = useState(component.pinned);
 	let [beingEdited, setBeingEdited] = useState(false);
-	let [comp, setComp] = useState(component);
 
 	if (beingEdited)
 		return (
 			<div className="flex flex-col mx-auto lg:w-auto md:w-auto sm:w-auto w-full">
 				<div className="NoteDiv flex flex-col min-h-[4rem] lg:w-[700px] md:w-[600px] sm:w-[500px] mx-5 mb-5 overflow-y-scroll px-3 py-1 rounded-md shadow-xl bg-[#ccd4de]">
-					{comp.type === "note" ? (
+					{component.type === "note" ? (
 						<FormNote
-							note={comp}
-							setNote={setComp}
+							note={component}
+							setNote={onComponentChange}
 						/>
 					) : (
 						<FormTodo
-							todo={comp}
-							setTodo={setComp}
+							todo={component}
+							setTodo={onComponentChange}
 						/>
 					)}
 					<button
@@ -121,13 +122,8 @@ const ComponentInfo = ({
 						className="bg-[#76abe8] text-white hover:scale-105 hover:shadow-md rounded-md py-1 px-3 my-2 mr-1 ml-auto"
 						onClick={() => {
 							const newComponent = {
-								...comp,
-								date: new Date().toLocaleDateString("en-IN"),
-								time: new Date().toLocaleTimeString("en-IN", {
-									hour12: false,
-									hour: "numeric",
-									minute: "numeric",
-								}),
+								...component,
+								date: new Date(new Date().getTime() + 330 * 60 * 1000),
 							};
 							onComponentChange(newComponent);
 							setBeingEdited(false);
@@ -184,11 +180,12 @@ const ComponentInfo = ({
 				) : (
 					<TodoListComponent
 						component={component}
-						onListChange={onListChange}
+						onComponentChange={onComponentChange}
 					/>
 				)}
 				<h3 className="p-1 text-xs text-[#0359c9] font-semibold inline ml-auto mt-auto select-none">
-					Last edited: {component.date} {component.time}
+					Last edited: {component.date.substring(0, 10)}{" "}
+					{component.date.substring(11, 16)}
 				</h3>
 			</div>
 		</div>
